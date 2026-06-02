@@ -110,6 +110,9 @@ export type AnimeDB = {
   imgXL: string
 
   description: string
+  watchStatus: string
+  currentEpisode: number
+  episodes: number
 
   characters: {
     edges: {
@@ -162,8 +165,8 @@ request.onupgradeneeded = () => {
   objectStore.createIndex('description', 'description', { unique: false })
   objectStore.createIndex('characters', 'characters', { unique: false })
   objectStore.createIndex('watchStatus', 'watchStatus', { unique: false })
-  objectStore.createIndex('atEpisode', 'atEpisode', { unique: false })
-  objectStore.createIndex('totalEpisode', 'totalEpisode', { unique: false })
+  objectStore.createIndex('currentEpisode', 'currentEpisode', { unique: false })
+  objectStore.createIndex('episodes', 'episodes', { unique: false })
 }
 
 request.onsuccess = async () => {
@@ -180,7 +183,7 @@ request.onsuccess = async () => {
 
   console.log('Anime Count: ', animeCount)
   if (Number(animeCount) == 0) {
-    const allAnimeDB = await fetch_all_anime()
+    const allAnimeDB = await fetch_all_anime(true)
     console.log(allAnimeDB)
     const animeObjectStore = db.transaction('anime', 'readwrite').objectStore('anime')
 
@@ -200,7 +203,7 @@ request.onsuccess = async () => {
 
       const description = anime.description || ''
       const characters = anime.characters || ''
-      const totalEpisode = anime.episodes
+      const episodes = anime.episodes
 
       animeObjectStore.add({
         id: id,
@@ -217,7 +220,7 @@ request.onsuccess = async () => {
         imgBann: imgBann,
         description: description,
         characters: characters,
-        totalEpisode: totalEpisode,
+        episodes: episodes,
       })
     }
     console.log("'anime' table has been filled")

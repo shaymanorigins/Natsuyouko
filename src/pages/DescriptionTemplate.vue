@@ -3,6 +3,17 @@
     <h1>Description</h1>
     <h1>{{ allAnime?.english || allAnime?.romaji || allAnime?.native }}</h1>
     <img :src="allAnime?.imgBann" />
+    <input v-on:change="updateEntry" v-model="currentEpisode" />
+    <select v-on:change="updateEntry" v-model="watchStatus">
+      <option value="watching">Watching</option>
+      <option value="completed">Completed</option>
+      <option value="on hold">On Hold</option>
+      <option value="dropped">Dropped</option>
+      <option value="plan to watch">Plan to Watch</option>
+    </select>
+    <p>
+      {{ allAnime?.currentEpisode }}/{{ allAnime?.episodes }}, status:{{ allAnime?.watchStatus }}
+    </p>
     <p v-html="allAnime?.description"></p>
     <div class="animeBoxD">
       <div
@@ -68,23 +79,49 @@ body {
 </style>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import { useRoute } from 'vue-router'
 import type { AnimeDB } from './HomePage.vue'
 
 const route = useRoute()
 const id = Number(route.params.id)
 const allAnime = ref<AnimeDB>()
+const currentEpisode = ref<number>()
+const watchStatus = ref<string>()
 
-onMounted(() => {
-  const request = indexedDB.open('natsuyoukoDB')
-  request.onsuccess = () => {
-    const db = request.result.transaction('anime', 'readonly').objectStore('anime').get(id)
-
-    db.onsuccess = () => {
-      allAnime.value = db.result
-      console.log(allAnime.value?.characters.edges)
-    }
+const request = indexedDB.open('natsuyoukoDB')
+request.onsuccess = () => {
+  const db = request.result.transaction('anime', 'readonly').objectStore('anime').get(id)
+  db.onsuccess = () => {
+    allAnime.value = db.result
   }
-})
+}
+
+async function updateEntry() {
+  if (watchStatus.value == 'completed') {
+    currentEpisode.value = Number(allAnime.value?.episodes)
+  }
+  if (currentEpisode.value == allAnime.value?.episodes) {
+    watchStatus.value = 'completed'
+  }
+  if (!currentEpisode.value || !watchStatus.value) return
+  if (currentEpisode.value > (allAnime.value?.episodes ? allAnime.value?.episodes : 0)) return
+
+  const db = request.result.transaction('anime', 'readonly').objectStore('anime').get(id)
+  const animeObject = await new Promise<AnimeDB>((resolve) => {
+    db.onsuccess = () => {
+      resolve(db.result)
+    }
+  })
+
+  if (animeObject) {
+    animeObject.watchStatus = watchStatus.value
+    animeObject.currentEpisode = currentEpisode.value
+    const update = request.result
+      .transaction('anime', 'readwrite')
+      .objectStore('anime')
+      .put(animeObject)
+    update.onsuccess = () => {}
+  }
+}
 </script>
