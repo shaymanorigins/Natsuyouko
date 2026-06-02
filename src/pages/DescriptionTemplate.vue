@@ -5,11 +5,12 @@
     <img :src="allAnime?.imgBann" />
     <input v-on:change="updateEntry" v-model="currentEpisode" />
     <select v-on:change="updateEntry" v-model="watchStatus">
-      <option value="watching">Watching</option>
-      <option value="completed">Completed</option>
-      <option value="on hold">On Hold</option>
-      <option value="dropped">Dropped</option>
+      <option value=""></option>
       <option value="plan to watch">Plan to Watch</option>
+      <option value="watching">Watching</option>
+      <option value="on hold">On Hold</option>
+      <option value="completed">Completed</option>
+      <option value="dropped">Dropped</option>
     </select>
     <p>
       {{ allAnime?.currentEpisode }}/{{ allAnime?.episodes }}, status:{{ allAnime?.watchStatus }}
@@ -98,6 +99,9 @@ request.onsuccess = () => {
 }
 
 async function updateEntry() {
+  if (watchStatus.value == '') {
+    currentEpisode.value = 0
+  }
   if (watchStatus.value == 'completed') {
     currentEpisode.value = Number(allAnime.value?.episodes)
   }

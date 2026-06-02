@@ -183,7 +183,7 @@ request.onsuccess = async () => {
 
   console.log('Anime Count: ', animeCount)
   if (Number(animeCount) == 0) {
-    const allAnimeDB = await fetch_all_anime(true)
+    const allAnimeDB = await fetch_all_anime()
     console.log(allAnimeDB)
     const animeObjectStore = db.transaction('anime', 'readwrite').objectStore('anime')
 
@@ -340,7 +340,10 @@ async function goEndAnime() {
 }
 
 function searchAnime() {
-  const range = IDBKeyRange.bound(searchString.value, searchString.value + '\uffff')
+  const range = IDBKeyRange.bound(
+    searchString.value.toLocaleLowerCase(),
+    searchString.value.toLocaleLowerCase() + '\uffff',
+  )
   const db = request.result
     .transaction('anime', 'readonly')
     .objectStore('anime')
