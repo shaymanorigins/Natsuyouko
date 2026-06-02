@@ -586,11 +586,11 @@ export async function fetch_all_anime(test_mode = false): Promise<Anime[]> {
       has_next_page = page_info.hasNextPage
       page += 1
 
+      await new Promise((resolve) => setTimeout(resolve, 850))
+
       if (test_mode && page > 2) {
         break
       }
-
-      await new Promise((resolve) => setTimeout(resolve, 750))
     }
     if (anime_batch) {
       all_anime.push(...anime_batch)
