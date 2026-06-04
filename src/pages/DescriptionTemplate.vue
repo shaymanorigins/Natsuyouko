@@ -2,24 +2,24 @@
   <div>
     <h1>Description</h1>
     <h1>{{ allAnime?.english || allAnime?.romaji || allAnime?.native }}</h1>
-    <img :src="allAnime?.imgBann" />
-    <input v-on:change="updateEntry" v-model="currentEpisode" />
+    <img class="imgBann" :src="allAnime?.imgBann" />
+    <button v-on:click="minEpisode(id)">-</button>
+    <input v-on:change="updateEpisode" v-model="currentEpisode" />
+    <button v-on:click="plusEpisode(id)">+</button>
     <select v-on:change="updateEntry" v-model="watchStatus">
       <option value=""></option>
-      <option value="plan to watch">Plan to Watch</option>
-      <option value="watching">Watching</option>
-      <option value="on hold">On Hold</option>
       <option value="completed">Completed</option>
       <option value="dropped">Dropped</option>
+      <option value="on_hold">On Hold</option>
+      <option value="plan_to_watch">Plan to Watch</option>
+      <option value="watching">Watching</option>
     </select>
-    <p>
-      {{ allAnime?.currentEpisode }}/{{ allAnime?.episodes }}, status:{{ allAnime?.watchStatus }}
-    </p>
+    <p>{{ allAnime?.currentEpisode }}/{{ allAnime?.episodes }}, status:{{ editWatchStatus }}</p>
     <p v-html="allAnime?.description"></p>
-    <div class="animeBoxD">
+    <div class="animeWindow">
       <div
         :id="character.id.toString()"
-        class="characterBox"
+        class="animeBox"
         v-for="character in allAnime?.characters.edges"
         :key="character.id"
       >
@@ -31,51 +31,8 @@
 </template>
 
 <style>
-body {
-  padding: 1vw;
-}
-
-.animeBoxD {
-  width: 80%;
-  display: grid;
-  margin: auto;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 1vw;
-}
-
-.characterbox {
-  display: grid;
-  grid-template-rows: min-content auto;
-  text-align: center;
-  width: 80%;
-  & img {
-    border-radius: 5px;
-    width: 100%;
-    aspect-ratio: 1 / 1.5;
-  }
-}
-
-@media only screen and (max-device-width: 320px) {
-  .animeBoxD {
-    width: 80%;
-    display: grid;
-    margin: auto;
-    grid-template-columns: repeat(1, 1fr);
-    gap: 1vw;
-  }
-
-  .characterbox {
-    display: grid;
-    grid-template-rows: min-content auto;
-    text-align: center;
-    width: 80%;
-    margin: auto;
-    & img {
-      border-radius: 5px;
-      width: 100%;
-      aspect-ratio: 1 / 1.5;
-    }
-  }
+.imgBann {
+  max-width: 100%;
 }
 </style>
 
@@ -89,27 +46,30 @@ const id = Number(route.params.id)
 const allAnime = ref<AnimeDB>()
 const currentEpisode = ref<number>()
 const watchStatus = ref<string>()
+const editWatchStatus = ref<string>()
 
 const request = indexedDB.open('natsuyoukoDB')
 request.onsuccess = () => {
   const db = request.result.transaction('anime', 'readonly').objectStore('anime').get(id)
   db.onsuccess = () => {
     allAnime.value = db.result
+
+    currentEpisode.value = db.result.currentEpisode
+    watchStatus.value = db.result.watchStatus
   }
 }
 
 async function updateEntry() {
-  if (watchStatus.value == '') {
-    currentEpisode.value = 0
-  }
   if (watchStatus.value == 'completed') {
     currentEpisode.value = Number(allAnime.value?.episodes)
   }
-  if (currentEpisode.value == allAnime.value?.episodes) {
-    watchStatus.value = 'completed'
-  }
   if (!currentEpisode.value || !watchStatus.value) return
-  if (currentEpisode.value > (allAnime.value?.episodes ? allAnime.value?.episodes : 0)) return
+  if (allAnime.value?.episodes) {
+    if (currentEpisode.value > allAnime.value?.episodes) {
+      currentEpisode.value = allAnime.value.episodes
+      await updateEpisode()
+    }
+  }
 
   const db = request.result.transaction('anime', 'readonly').objectStore('anime').get(id)
   const animeObject = await new Promise<AnimeDB>((resolve) => {
@@ -125,7 +85,73 @@ async function updateEntry() {
       .transaction('anime', 'readwrite')
       .objectStore('anime')
       .put(animeObject)
-    update.onsuccess = () => {}
+    update.onsuccess = () => {
+      if (allAnime.value) {
+        allAnime.value.watchStatus = animeObject.watchStatus
+        allAnime.value.currentEpisode = animeObject.currentEpisode
+      }
+      if (allAnime.value?.watchStatus) {
+        editWatchStatus.value = allAnime.value.watchStatus.replaceAll('_', ' ')
+      }
+      watchStatus.value = animeObject.watchStatus
+      currentEpisode.value = animeObject.currentEpisode
+    }
+  }
+}
+
+async function updateEpisode() {
+  if (allAnime.value?.episodes) {
+    if (currentEpisode.value == allAnime.value.episodes) {
+      watchStatus.value = 'completed'
+    }
+  }
+  await updateEntry()
+}
+
+async function plusEpisode(id: number) {
+  const transaction = request.result.transaction('anime', 'readwrite').objectStore('anime').get(id)
+  const tempTransaction = await new Promise<AnimeDB>((resolve) => {
+    transaction.onsuccess = () => {
+      resolve(transaction.result)
+    }
+  })
+
+  if (tempTransaction) {
+    tempTransaction.currentEpisode += 1
+  }
+
+  const update = request.result
+    .transaction('anime', 'readwrite')
+    .objectStore('anime')
+    .put(tempTransaction)
+  update.onsuccess = () => {
+    currentEpisode.value = tempTransaction.currentEpisode
+    updateEpisode()
+  }
+}
+
+async function minEpisode(id: number) {
+  const transaction = request.result.transaction('anime', 'readwrite').objectStore('anime').get(id)
+  const tempTransaction = await new Promise<AnimeDB>((resolve) => {
+    transaction.onsuccess = () => {
+      resolve(transaction.result)
+    }
+  })
+
+  if (tempTransaction) {
+    if (tempTransaction.watchStatus == 'completed') {
+      watchStatus.value = 'watching'
+    }
+    tempTransaction.currentEpisode -= 1
+  }
+
+  const update = request.result
+    .transaction('anime', 'readwrite')
+    .objectStore('anime')
+    .put(tempTransaction)
+  update.onsuccess = () => {
+    currentEpisode.value = tempTransaction.currentEpisode
+    updateEpisode()
   }
 }
 </script>

@@ -23,74 +23,7 @@
   </div>
 </template>
 
-<style>
-body {
-  padding: 1vw;
-}
-
-.buttonBox {
-  width: 80%;
-  margin: auto;
-  text-align: center;
-  & button {
-    font-size: 1vw;
-    margin: 10px;
-  }
-}
-
-.animeWindow {
-  width: 80%;
-  display: grid;
-  margin: auto;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 1vw;
-}
-
-.animeBox {
-  display: grid;
-  grid-template-rows: min-content auto;
-  text-align: center;
-  width: 80%;
-  & img {
-    border-radius: 5px;
-    width: 100%;
-    aspect-ratio: 1 / 1.5;
-  }
-}
-
-@media only screen and (max-device-width: 320px) {
-  .buttonBox {
-    width: 80%;
-    margin: auto;
-    text-align: center;
-    & button {
-      font-size: 3vw;
-      margin: 10px;
-    }
-  }
-
-  .animeWindow {
-    width: 80%;
-    display: grid;
-    margin: auto;
-    grid-template-columns: repeat(1, 1fr);
-    gap: 1vw;
-  }
-
-  .animeBox {
-    display: grid;
-    grid-template-rows: min-content auto;
-    text-align: center;
-    width: 80%;
-    margin: auto;
-    & img {
-      border-radius: 5px;
-      width: 100%;
-      aspect-ratio: 1 / 1.5;
-    }
-  }
-}
-</style>
+<style></style>
 
 <script setup lang="ts">
 import { ref } from 'vue'

@@ -1,0 +1,89 @@
+html {
+  width: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+.mainNav {
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  padding: 10px;
+  gap: 10px;
+  font-size: 20px;
+  align-items: center;
+  border: 1px solid black;
+  & a {
+    text-decoration: none;
+  }
+}
+
+.buttonBox {
+  width: 80%;
+  margin: auto;
+  text-align: center;
+  & button {
+    font-size: 1vw;
+    margin: 10px;
+  }
+}
+
+.animeWindow {
+  width: 80%;
+  display: grid;
+  margin: auto;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1vw;
+}
+
+.animeBox {
+  display: grid;
+  grid-template-rows: min-content auto;
+  text-align: center;
+  width: 80%;
+  & img {
+    border-radius: 5px;
+    width: 100%;
+    aspect-ratio: 1 / 1.5;
+  }
+}
+
+@media only screen and (max-device-width: 436px) {
+  .buttonBox {
+    width: 80%;
+    margin: auto;
+    text-align: center;
+    & button {
+      font-size: 3vw;
+      margin: 10px;
+    }
+  }
+
+  .animeWindow {
+    width: 80%;
+    display: grid;
+    margin: auto;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 1vw;
+  }
+
+  .animeBox {
+    display: grid;
+    grid-template-rows: min-content auto;
+    text-align: center;
+    width: 80%;
+    margin: auto;
+    & img {
+      border-radius: 5px;
+      width: 100%;
+      aspect-ratio: 1 / 1.5;
+    }
+  }
+}
