@@ -1,6 +1,5 @@
 <template>
-  <div>MyAnime</div>
-  <nav>
+  <nav class="animeNav">
     <RouterLink to="/MyAnime/all">All</RouterLink>
     <RouterLink to="/MyAnime/watching">Watching</RouterLink>
     <RouterLink to="/MyAnime/on_hold">On Hold</RouterLink>
@@ -8,65 +7,80 @@
     <RouterLink to="/MyAnime/completed">Completed</RouterLink>
     <RouterLink to="/MyAnime/plan_to_watch">Plan To Watch</RouterLink>
   </nav>
-  <div v-if="status === 'all' || status === 'watching'" class="visibilitySwitch">
+  <div
+    v-if="(status === 'all' || status === 'watching') && myAnimeW.length > 0"
+    class="visibilitySwitch"
+  >
     <h1>Watching</h1>
     <hr />
-    <div :id="anime.id.toString()" v-for="anime in myAnimeW" :key="anime.id">
+    <div class="animeDescBox" :id="anime.id.toString()" v-for="anime in myAnimeW" :key="anime.id">
+      <img :src="anime.imgM" />
       <p>
         {{ anime.english || anime.romaji || anime.native }}: {{ anime.currentEpisode }}/{{
           anime.episodes
         }}, Status: {{ anime.watchStatus }}
       </p>
     </div>
-    <hr />
   </div>
-  <div v-if="status === 'all' || status === 'on_hold'" class="visibilitySwitch">
+  <div
+    v-if="(status === 'all' || status === 'on_hold') && myAnimeO.length > 0"
+    class="visibilitySwitch"
+  >
     <h1>On Hold</h1>
     <hr />
     <div :id="anime.id.toString()" v-for="anime in myAnimeO" :key="anime.id">
+      <img :src="anime.imgM" />
       <p>
         {{ anime.english || anime.romaji || anime.native }}: {{ anime.currentEpisode }}/{{
           anime.episodes
         }}, Status: {{ anime.watchStatus }}
       </p>
     </div>
-    <hr />
   </div>
-  <div v-if="status === 'all' || status === 'dropped'" class="visibilitySwitch">
+  <div
+    v-if="(status === 'all' || status === 'dropped') && myAnimeD.length > 0"
+    class="visibilitySwitch"
+  >
     <h1>Dropped</h1>
     <hr />
     <div :id="anime.id.toString()" v-for="anime in myAnimeD" :key="anime.id">
+      <img :src="anime.imgM" />
       <p>
         {{ anime.english || anime.romaji || anime.native }}: {{ anime.currentEpisode }}/{{
           anime.episodes
         }}, Status: {{ anime.watchStatus }}
       </p>
     </div>
-    <hr />
   </div>
-  <div v-if="status === 'all' || status === 'completed'" class="visibilitySwitch">
+  <div
+    v-if="(status === 'all' || status === 'completed') && myAnimeC.length > 0"
+    class="visibilitySwitch"
+  >
     <h1>Completed</h1>
     <hr />
     <div :id="anime.id.toString()" v-for="anime in myAnimeC" :key="anime.id">
+      <img :src="anime.imgM" />
       <p>
         {{ anime.english || anime.romaji || anime.native }}: {{ anime.currentEpisode }}/{{
           anime.episodes
         }}, Status: {{ anime.watchStatus }}
       </p>
     </div>
-    <hr />
   </div>
-  <div v-if="status === 'all' || status === 'plan_to_watch'" class="visibilitySwitch">
+  <div
+    v-if="(status === 'all' || status === 'plan_to_watch') && myAnimeP.length > 0"
+    class="visibilitySwitch"
+  >
     <h1>Plan To Watch</h1>
     <hr />
     <div :id="anime.id.toString()" v-for="anime in myAnimeP" :key="anime.id">
+      <img :src="anime.imgM" />
       <p>
         {{ anime.english || anime.romaji || anime.native }}: {{ anime.currentEpisode }}/{{
           anime.episodes
         }}, Status: {{ anime.watchStatus }}
       </p>
     </div>
-    <hr />
   </div>
 </template>
 

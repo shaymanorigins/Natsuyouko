@@ -1,5 +1,4 @@
 <template>
-  <h1>Home</h1>
   <div class="buttonBox">
     <button v-on:click="goBeginAnime">begin</button>
     <button v-on:click="goBackAnime">back</button>
@@ -16,6 +15,12 @@
     >
       <img :id="String(anime.id)" :src="anime.imgXL" />
       <p>{{ anime.english || anime.romaji || anime.native }}</p>
+    </div>
+    <div class="buttonBox">
+      <button v-on:click="goBeginAnime">begin</button>
+      <button v-on:click="goBackAnime">back</button>
+      <button v-on:click="loadAnime">forward</button>
+      <button v-on:click="goEndAnime">end</button>
     </div>
   </div>
   <div v-else>

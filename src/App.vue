@@ -4,6 +4,7 @@
     <RouterLink to="/MyAnime/all">Interactions</RouterLink>
   </nav>
   <RouterView></RouterView>
+  <footer></footer>
 </template>
 
 <style>
