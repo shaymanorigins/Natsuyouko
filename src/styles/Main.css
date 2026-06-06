@@ -52,7 +52,6 @@ footer {
 .buttonBox {
   width: 80%;
   margin: auto;
-  grid-column: 1/6;
   text-align: center;
   & button {
     font-size: 1vw;
@@ -129,5 +128,14 @@ footer {
       width: 100%;
       aspect-ratio: 1 / 1.5;
     }
+  }
+
+  .animeDescBox {
+    display: flex;
+    align-content: center;
+    gap: 1vw;
+    padding: 10px;
+    border-bottom: 1px solid #4e4c4f;
+    flex-direction: row;
   }
 }
