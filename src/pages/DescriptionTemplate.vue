@@ -121,7 +121,7 @@ async function plusEpisode(id: number) {
   })
 
   if (tempTransaction) {
-    tempTransaction.currentEpisode = Number(tempTransaction.currentEpisode) + 1
+    tempTransaction.currentEpisode = Number(tempTransaction.currentEpisode) + 1 || 1
   }
 
   const update = request.result
