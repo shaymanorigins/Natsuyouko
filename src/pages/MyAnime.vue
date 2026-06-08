@@ -1,4 +1,5 @@
 <template>
+  <div class="bannerBox"></div>
   <nav class="animeNav">
     <RouterLink to="/MyAnime/all">All</RouterLink>
     <RouterLink to="/MyAnime/watching">Watching</RouterLink>
@@ -14,12 +15,14 @@
     <h1>Watching</h1>
     <hr />
     <div class="animeDescBox" :id="anime.id.toString()" v-for="anime in myAnimeW" :key="anime.id">
-      <img :src="anime.imgM" />
+      <img :src="anime.imgM" v-on:click="router.push(`/Description/${anime.id}`)" />
       <p>
         {{ anime.english || anime.romaji || anime.native }}: {{ anime.currentEpisode }}/{{
           anime.episodes
         }}, Status: {{ anime.watchStatus }}
       </p>
+      <button v-on:click="plusEpisode(anime)">+</button>
+      <button v-on:click="deleteInteraction(anime)"></button>
     </div>
   </div>
   <div
@@ -28,13 +31,15 @@
   >
     <h1>On Hold</h1>
     <hr />
-    <div :id="anime.id.toString()" v-for="anime in myAnimeO" :key="anime.id">
-      <img :src="anime.imgM" />
+    <div class="animeDescBox" :id="anime.id.toString()" v-for="anime in myAnimeO" :key="anime.id">
+      <img :src="anime.imgM" v-on:click="router.push(`/Description/${anime.id}`)" />
       <p>
         {{ anime.english || anime.romaji || anime.native }}: {{ anime.currentEpisode }}/{{
           anime.episodes
         }}, Status: {{ anime.watchStatus }}
       </p>
+      <button v-on:click="plusEpisode(anime)">+</button>
+      <button v-on:click="deleteInteraction(anime)"></button>
     </div>
   </div>
   <div
@@ -43,13 +48,15 @@
   >
     <h1>Dropped</h1>
     <hr />
-    <div :id="anime.id.toString()" v-for="anime in myAnimeD" :key="anime.id">
-      <img :src="anime.imgM" />
+    <div class="animeDescBox" :id="anime.id.toString()" v-for="anime in myAnimeD" :key="anime.id">
+      <img :src="anime.imgM" v-on:click="router.push(`/Description/${anime.id}`)" />
       <p>
         {{ anime.english || anime.romaji || anime.native }}: {{ anime.currentEpisode }}/{{
           anime.episodes
         }}, Status: {{ anime.watchStatus }}
       </p>
+      <button v-on:click="plusEpisode(anime)">+</button>
+      <button v-on:click="deleteInteraction(anime)"></button>
     </div>
   </div>
   <div
@@ -58,13 +65,15 @@
   >
     <h1>Completed</h1>
     <hr />
-    <div :id="anime.id.toString()" v-for="anime in myAnimeC" :key="anime.id">
-      <img :src="anime.imgM" />
+    <div class="animeDescBox" :id="anime.id.toString()" v-for="anime in myAnimeC" :key="anime.id">
+      <img :src="anime.imgM" v-on:click="router.push(`/Description/${anime.id}`)" />
       <p>
         {{ anime.english || anime.romaji || anime.native }}: {{ anime.currentEpisode }}/{{
           anime.episodes
         }}, Status: {{ anime.watchStatus }}
       </p>
+      <button v-on:click="plusEpisode(anime)">+</button>
+      <button v-on:click="deleteInteraction(anime)"></button>
     </div>
   </div>
   <div
@@ -73,13 +82,15 @@
   >
     <h1>Plan To Watch</h1>
     <hr />
-    <div :id="anime.id.toString()" v-for="anime in myAnimeP" :key="anime.id">
-      <img :src="anime.imgM" />
+    <div class="animeDescBox" :id="anime.id.toString()" v-for="anime in myAnimeP" :key="anime.id">
+      <img :src="anime.imgM" v-on:click="router.push(`/Description/${anime.id}`)" />
       <p>
         {{ anime.english || anime.romaji || anime.native }}: {{ anime.currentEpisode }}/{{
           anime.episodes
         }}, Status: {{ anime.watchStatus }}
       </p>
+      <button v-on:click="plusEpisode(anime)">+</button>
+      <button v-on:click="deleteInteraction(anime)"></button>
     </div>
   </div>
 </template>
@@ -88,6 +99,7 @@
 import { ref, computed } from 'vue'
 import type { AnimeDB } from './HomePage.vue'
 import { useRoute } from 'vue-router'
+import router from '@/router'
 
 const myAnimeC = ref<AnimeDB[]>([])
 const myAnimeD = ref<AnimeDB[]>([])
@@ -150,5 +162,63 @@ request.onsuccess = async () => {
       resolve(fetchMyAnimeW.result)
     }
   })
+}
+
+async function plusEpisode(anime: AnimeDB) {
+  const transaction = request.result
+    .transaction('anime', 'readonly')
+    .objectStore('anime')
+    .get(anime.id)
+  const animeData = await new Promise<AnimeDB>((resolve) => {
+    transaction.onsuccess = () => {
+      resolve(transaction.result)
+    }
+  })
+  if (animeData) {
+    animeData.currentEpisode = Number(animeData.currentEpisode) + 1
+    if (animeData.currentEpisode > animeData.episodes) {
+      animeData.currentEpisode = animeData.episodes
+    }
+    if (!(anime.currentEpisode >= anime.episodes)) {
+      anime.currentEpisode = Number(anime.currentEpisode) + 1
+      if (anime.currentEpisode > anime.episodes) {
+        anime.currentEpisode = anime.episodes
+      }
+      if (anime.currentEpisode == anime.episodes) {
+        anime.watchStatus = 'completed'
+        animeData.watchStatus = 'completed'
+      }
+    }
+  }
+  const resolve = request.result
+    .transaction('anime', 'readwrite')
+    .objectStore('anime')
+    .put(animeData)
+  resolve.onsuccess = () => {
+    location.reload()
+  }
+}
+
+async function deleteInteraction(anime: AnimeDB) {
+  const transaction = request.result
+    .transaction('anime', 'readonly')
+    .objectStore('anime')
+    .get(anime.id)
+  const animeData = await new Promise<AnimeDB>((resolve) => {
+    transaction.onsuccess = () => {
+      resolve(transaction.result)
+    }
+  })
+  if (animeData) {
+    animeData.watchStatus = ''
+    animeData.currentEpisode = 0
+  }
+  const resolve = request.result
+    .transaction('anime', 'readwrite')
+    .objectStore('anime')
+    .put(animeData)
+  resolve.onsuccess = () => {
+    location.reload()
+  }
 }
 </script>

@@ -7,7 +7,6 @@
     <input v-on:change="updateEpisode" v-model="currentEpisode" />
     <button v-on:click="plusEpisode(id)">+</button>
     <select v-on:change="updateEntry" v-model="watchStatus">
-      <option value=""></option>
       <option value="completed">Completed</option>
       <option value="dropped">Dropped</option>
       <option value="on_hold">On Hold</option>
@@ -32,7 +31,7 @@
 
 <style>
 .imgBann {
-  max-width: 100%;
+  width: 100%;
 }
 </style>
 
@@ -63,9 +62,9 @@ async function updateEntry() {
   if (watchStatus.value == 'completed') {
     currentEpisode.value = Number(allAnime.value?.episodes)
   }
-  if (!currentEpisode.value || !watchStatus.value) return
-  if (allAnime.value?.episodes) {
-    if (currentEpisode.value > allAnime.value?.episodes) {
+  if (currentEpisode.value === undefined || watchStatus.value === undefined) return
+  if (allAnime.value) {
+    if (currentEpisode.value > allAnime.value.episodes) {
       currentEpisode.value = allAnime.value.episodes
       await updateEpisode()
     }
@@ -100,9 +99,12 @@ async function updateEntry() {
 }
 
 async function updateEpisode() {
-  if (allAnime.value?.episodes) {
+  if (allAnime.value && !(currentEpisode.value === undefined)) {
     if (currentEpisode.value == allAnime.value.episodes) {
       watchStatus.value = 'completed'
+    }
+    if (currentEpisode.value < allAnime.value.episodes) {
+      watchStatus.value = 'watching'
     }
   }
   await updateEntry()
@@ -117,7 +119,7 @@ async function plusEpisode(id: number) {
   })
 
   if (tempTransaction) {
-    tempTransaction.currentEpisode += 1
+    tempTransaction.currentEpisode = Number(tempTransaction.currentEpisode) + 1
   }
 
   const update = request.result

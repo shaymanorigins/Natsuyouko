@@ -2,8 +2,14 @@
   <div class="buttonBox">
     <button v-on:click="goBeginAnime">begin</button>
     <button v-on:click="goBackAnime">back</button>
+    <input class="currentPage" v-on:change="goToPage(currentPage - 1)" v-model="currentPage" />
     <button v-on:click="loadAnime">forward</button>
     <button v-on:click="goEndAnime">end</button>
+    <select v-model="itemAmount">
+      <option value="25">25</option>
+      <option value="50">50</option>
+      <option value="100">100</option>
+    </select>
     <input id="searchBar" v-model="searchString" v-on:input="searchAnime" />
   </div>
   <div class="animeWindow" v-if="allAnime.length > 0">
@@ -19,8 +25,10 @@
     <div class="buttonBox">
       <button v-on:click="goBeginAnime">begin</button>
       <button v-on:click="goBackAnime">back</button>
+      <input class="currentPage" v-on:change="goToPage(currentPage - 1)" v-model="currentPage" />
       <button v-on:click="loadAnime">forward</button>
       <button v-on:click="goEndAnime">end</button>
+      <p>Maximum pages = {{ pages || 1 }}</p>
     </div>
   </div>
   <div v-else>
@@ -28,10 +36,14 @@
   </div>
 </template>
 
-<style></style>
+<style>
+.currentPage {
+  text-align: center;
+}
+</style>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { fetch_all_anime } from '@/updates/Fetch_Anime'
 import router from '@/router'
 
@@ -75,6 +87,13 @@ export type AnimeDB = {
 const request = indexedDB.open('natsuyoukoDB')
 const allAnime = ref<AnimeDB[]>([])
 const searchString = ref('')
+const currentPage = ref(0)
+const pages = ref()
+const itemAmount = ref(50)
+watch(itemAmount, () => {
+  currentPage.value = 1
+  goToPage(0)
+})
 
 request.onerror = () => {
   console.error(`Database error: ${request.error?.message}`)
@@ -169,26 +188,45 @@ request.onsuccess = async () => {
   }
 }
 
-function loadAnime() {
+async function loadAnime() {
+  const countReq = request.result.transaction('anime', 'readonly').objectStore('anime').count()
+  const totalPages = await new Promise<number>((resolve) => {
+    countReq.onsuccess = () => {
+      resolve(Math.ceil(countReq.result / itemAmount.value) - 1)
+    }
+  })
+  if (currentPage.value >= totalPages) {
+    return
+  }
   const lastIndex = allAnime.value.length - 1
   const lastItem = allAnime.value[lastIndex] || null
   const range = lastItem ? IDBKeyRange.lowerBound(lastItem?.id, true) : null
   const fetchNewAnime = request.result
     .transaction('anime', 'readonly')
     .objectStore('anime')
-    .getAll(range, 100)
+    .getAll(range, itemAmount.value)
 
   fetchNewAnime.onsuccess = () => {
     allAnime.value = fetchNewAnime.result
   }
+  if (currentPage.value == 0) {
+    goToPage(currentPage.value - 1)
+  }
+  currentPage.value = Number(currentPage.value) + 1
 }
 
 function goBeginAnime() {
+  currentPage.value = 0
   allAnime.value = []
   loadAnime()
 }
 
 async function goBackAnime() {
+  if (currentPage.value == 1) {
+    return
+  } else {
+    currentPage.value -= 1
+  }
   const firstItem = allAnime.value[0] || null
   const range = firstItem ? IDBKeyRange.upperBound(firstItem.id) : null
   const lastPage = request.result.transaction('anime', 'readonly').objectStore('anime').count()
@@ -198,7 +236,7 @@ async function goBackAnime() {
     }
   })
 
-  const goBack = lastPageCount % 100
+  const goBack = lastPageCount % itemAmount.value || itemAmount.value
 
   const tempRange = await new Promise((resolve) => {
     const cursor = request.result
@@ -207,12 +245,12 @@ async function goBackAnime() {
       .openCursor(range, 'prev')
     cursor.onsuccess = () => {
       if (allAnime.value.length < goBack) {
-        cursor.result?.advance(goBack)
+        cursor.result?.advance(goBack - 1)
         cursor.onsuccess = () => {
           resolve(cursor.result?.key)
         }
       } else {
-        cursor.result?.advance(100)
+        cursor.result?.advance(itemAmount.value)
         cursor.onsuccess = () => {
           resolve(cursor.result?.key)
         }
@@ -234,7 +272,7 @@ async function goBackAnime() {
     const fetchOldAnime = request.result
       .transaction('anime', 'readonly')
       .objectStore('anime')
-      .getAll(newRange, 100)
+      .getAll(newRange, itemAmount.value)
 
     fetchOldAnime.onsuccess = () => {
       allAnime.value = fetchOldAnime.result
@@ -250,8 +288,7 @@ async function goEndAnime() {
     }
   })
 
-  const goBack = lastPageCount % 100
-  console.log(goBack, 'not', lastPageCount)
+  const goBack = lastPageCount % itemAmount.value || itemAmount.value
   const pointer = request.result
     .transaction('anime', 'readonly')
     .objectStore('anime')
@@ -259,7 +296,7 @@ async function goEndAnime() {
   const startAnime = Number(
     await new Promise((resolve) => {
       pointer.onsuccess = () => {
-        pointer.result?.advance(goBack)
+        pointer.result?.advance(goBack - 1)
         pointer.onsuccess = () => {
           resolve(pointer.result?.key)
         }
@@ -274,6 +311,7 @@ async function goEndAnime() {
     .getAll(keyrange, goBack)
   fetchEndAnime.onsuccess = () => {
     allAnime.value = fetchEndAnime.result
+    currentPage.value = pages.value
   }
 }
 
@@ -290,6 +328,49 @@ function searchAnime() {
 
   db.onsuccess = () => {
     allAnime.value = db.result
+  }
+}
+
+async function goToPage(page: number) {
+  const transaction = request.result.transaction('anime', 'readonly').objectStore('anime').count()
+  let key
+  const items = await new Promise<number>((resolve) => {
+    transaction.onsuccess = () => {
+      resolve(transaction.result)
+    }
+  })
+  if (items) {
+    pages.value = Math.ceil(items / itemAmount.value)
+    if (page > pages.value) {
+      page = pages.value - 1
+      currentPage.value = pages.value
+    }
+  }
+  if (page > 0) {
+    const cursor = request.result
+      .transaction('anime', 'readwrite')
+      .objectStore('anime')
+      .openCursor()
+    key = await new Promise((resolve) => {
+      cursor.onsuccess = () => {
+        if (cursor.result) {
+          cursor.result?.advance(page * itemAmount.value)
+          cursor.onsuccess = () => {
+            resolve(cursor.result?.key || null)
+          }
+        } else {
+          resolve(null)
+        }
+      }
+    })
+  }
+  const range = key ? IDBKeyRange.lowerBound(key) : null
+  const resolve = request.result
+    .transaction('anime', 'readonly')
+    .objectStore('anime')
+    .getAll(range, itemAmount.value)
+  resolve.onsuccess = () => {
+    allAnime.value = resolve.result
   }
 }
 </script>
