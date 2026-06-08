@@ -5,6 +5,8 @@
     <input class="currentPage" v-on:change="goToPage(currentPage - 1)" v-model="currentPage" />
     <button v-on:click="loadAnime">forward</button>
     <button v-on:click="goEndAnime">end</button>
+  </div>
+  <div class="secundBBox">
     <select v-model="itemAmount">
       <option value="25">25</option>
       <option value="50">50</option>
@@ -28,7 +30,7 @@
       <input class="currentPage" v-on:change="goToPage(currentPage - 1)" v-model="currentPage" />
       <button v-on:click="loadAnime">forward</button>
       <button v-on:click="goEndAnime">end</button>
-      <p>Maximum pages = {{ pages || 1 }}</p>
+      <p style="grid-column: 1/-1">Maximum pages = {{ pages || 1 }}</p>
     </div>
   </div>
   <div v-else>

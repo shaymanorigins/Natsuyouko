@@ -13,7 +13,9 @@
       <option value="plan_to_watch">Plan to Watch</option>
       <option value="watching">Watching</option>
     </select>
-    <p>{{ allAnime?.currentEpisode }}/{{ allAnime?.episodes }}, status:{{ editWatchStatus }}</p>
+    <p>
+      {{ allAnime?.currentEpisode }}/{{ allAnime?.episodes || '??' }}, status:{{ editWatchStatus }}
+    </p>
     <p v-html="allAnime?.description"></p>
     <div class="animeWindow">
       <div

@@ -91,6 +91,13 @@ footer {
   grid-column: 1/6;
 }
 
+.secundBBox {
+  grid-column: 1/ -1;
+  margin: auto;
+  text-align: center;
+  padding: 3vw;
+}
+
 .animeWindow {
   width: 80%;
   display: grid;
@@ -135,10 +142,19 @@ footer {
     width: 80%;
     margin: auto;
     text-align: center;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
     & button {
       font-size: 3vw;
       margin: 10px;
     }
+    & input {
+      width: 6vw;
+    }
+  }
+
+  .animeBox {
+    grid-column: 1/ -1;
   }
 
   .animeWindow {
