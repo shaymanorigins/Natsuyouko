@@ -66,7 +66,7 @@ async function updateEntry() {
   }
   if (currentEpisode.value === undefined || watchStatus.value === undefined) return
   if (allAnime.value) {
-    if (currentEpisode.value > allAnime.value.episodes) {
+    if (currentEpisode.value > allAnime.value.episodes && allAnime.value.episodes != null) {
       currentEpisode.value = allAnime.value.episodes
       await updateEpisode()
     }
@@ -102,10 +102,10 @@ async function updateEntry() {
 
 async function updateEpisode() {
   if (allAnime.value && !(currentEpisode.value === undefined)) {
-    if (currentEpisode.value == allAnime.value.episodes) {
+    if (currentEpisode.value == allAnime.value.episodes || allAnime.value.episodes == null) {
       watchStatus.value = 'completed'
     }
-    if (currentEpisode.value < allAnime.value.episodes) {
+    if (currentEpisode.value < allAnime.value.episodes || allAnime.value.episodes == null) {
       watchStatus.value = 'watching'
     }
   }

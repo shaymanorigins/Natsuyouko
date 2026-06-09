@@ -18,7 +18,7 @@
       <img :src="anime.imgM" v-on:click="router.push(`/Description/${anime.id}`)" />
       <p>
         {{ anime.english || anime.romaji || anime.native }}: {{ anime.currentEpisode }}/{{
-          anime.episodes
+          anime.episodes || '??'
         }}, Status: {{ anime.watchStatus }}
       </p>
       <button v-on:click="plusEpisode(anime)">+</button>
@@ -176,15 +176,15 @@ async function plusEpisode(anime: AnimeDB) {
   })
   if (animeData) {
     animeData.currentEpisode = Number(animeData.currentEpisode) + 1
-    if (animeData.currentEpisode > animeData.episodes) {
+    if (animeData.currentEpisode > animeData.episodes && anime.episodes != null) {
       animeData.currentEpisode = animeData.episodes
     }
-    if (!(anime.currentEpisode >= anime.episodes)) {
+    if (!(anime.currentEpisode >= anime.episodes && anime.episodes)) {
       anime.currentEpisode = Number(anime.currentEpisode) + 1
-      if (anime.currentEpisode > anime.episodes) {
+      if (anime.currentEpisode > anime.episodes && anime.episodes) {
         anime.currentEpisode = anime.episodes
       }
-      if (anime.currentEpisode == anime.episodes) {
+      if (anime.currentEpisode == anime.episodes && anime.episodes) {
         anime.watchStatus = 'completed'
         animeData.watchStatus = 'completed'
       }
