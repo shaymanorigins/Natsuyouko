@@ -197,7 +197,7 @@ async function loadAnime() {
       resolve(Math.ceil(countReq.result / itemAmount.value) - 1)
     }
   })
-  if (currentPage.value >= totalPages) {
+  if (currentPage.value >= totalPages + 1) {
     return
   }
   const lastIndex = allAnime.value.length - 1
