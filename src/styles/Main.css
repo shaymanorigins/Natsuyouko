@@ -55,8 +55,10 @@ footer {
   font-size: 15px;
   font-weight: bold;
   align-items: center;
-  justify-content: center;
+  overflow-x: scroll;
+  scrollbar-width: none;
   & a {
+    flex: 0 0 auto;
     text-decoration: none;
   }
   & a:visited {
@@ -66,15 +68,6 @@ footer {
     color: #eef0e9;
     text-shadow: 1px 1px 1px #99ea9c;
   }
-}
-
-.animeNav {
-  display: flex;
-  white-space: nowrap;
-  box-sizing: border-box;
-  gap: 10px;
-  overflow-x: scroll;
-  scrollbar-width: none;
 }
 
 .buttonBox {
@@ -153,16 +146,12 @@ footer {
     }
   }
 
-  .animeBox {
-    grid-column: 1/ -1;
-  }
-
   .animeWindow {
     width: 80%;
     display: grid;
     margin: auto;
     grid-template-columns: repeat(1, 1fr);
-    gap: 1vw;
+    gap: 5vw;
   }
 
   .animeBox {
@@ -171,6 +160,7 @@ footer {
     text-align: center;
     width: 80%;
     margin: auto;
+    grid-column: 1/-1;
     & img {
       border-radius: 5px;
       width: 100%;
@@ -180,10 +170,15 @@ footer {
 
   .animeDescBox {
     display: flex;
+    align-items: center;
     align-content: center;
     gap: 1vw;
     padding: 10px;
     border-bottom: 1px solid #4e4c4f;
     flex-direction: row;
+    & button {
+      font-size: 24px;
+      margin: 5px;
+    }
   }
 }

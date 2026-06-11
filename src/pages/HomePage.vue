@@ -13,6 +13,11 @@
       <option value="100">100</option>
     </select>
     <input id="searchBar" v-model="searchString" v-on:input="searchAnime" />
+    <select v-model="searchIn" v-on:change="searchAnime">
+      <option value="englishLower">English</option>
+      <option value="romajiLower">Romaji</option>
+      <option value="Native">Native</option>
+    </select>
   </div>
   <div class="animeWindow" v-if="allAnime.length > 0">
     <div
@@ -92,6 +97,7 @@ const searchString = ref('')
 const currentPage = ref(0)
 const pages = ref()
 const itemAmount = ref(50)
+const searchIn = ref('englishLower')
 watch(itemAmount, () => {
   currentPage.value = 1
   goToPage(0)
@@ -317,7 +323,11 @@ async function goEndAnime() {
   }
 }
 
-function searchAnime() {
+async function searchAnime() {
+  if (searchString.value == '') {
+    await goBeginAnime()
+    return
+  }
   const range = IDBKeyRange.bound(
     searchString.value.toLocaleLowerCase(),
     searchString.value.toLocaleLowerCase() + '\uffff',
@@ -325,7 +335,7 @@ function searchAnime() {
   const db = request.result
     .transaction('anime', 'readonly')
     .objectStore('anime')
-    .index('englishLower')
+    .index(`${searchIn.value}`)
     .getAll(range, 1000)
 
   db.onsuccess = () => {
