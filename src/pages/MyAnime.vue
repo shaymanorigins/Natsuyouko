@@ -1,5 +1,4 @@
 <template>
-  <div class="bannerBox"></div>
   <nav class="animeNav">
     <RouterLink to="/MyAnime/all">All</RouterLink>
     <RouterLink to="/MyAnime/watching">Watching</RouterLink>
@@ -21,8 +20,10 @@
           anime.episodes || '??'
         }}, Status: {{ anime.watchStatus }}
       </p>
-      <button v-on:click="plusEpisode(anime)">+</button>
-      <button v-on:click="deleteInteraction(anime)"></button>
+      <div>
+        <button v-on:click="plusEpisode(anime)">+</button>
+        <button v-on:click="deleteInteraction(anime)"></button>
+      </div>
     </div>
   </div>
   <div
@@ -38,8 +39,10 @@
           anime.episodes
         }}, Status: {{ anime.watchStatus }}
       </p>
-      <button v-on:click="plusEpisode(anime)">+</button>
-      <button v-on:click="deleteInteraction(anime)"></button>
+      <div>
+        <button v-on:click="plusEpisode(anime)">+</button>
+        <button v-on:click="deleteInteraction(anime)"></button>
+      </div>
     </div>
   </div>
   <div
@@ -55,8 +58,10 @@
           anime.episodes
         }}, Status: {{ anime.watchStatus }}
       </p>
-      <button v-on:click="plusEpisode(anime)">+</button>
-      <button v-on:click="deleteInteraction(anime)"></button>
+      <div>
+        <button v-on:click="plusEpisode(anime)">+</button>
+        <button v-on:click="deleteInteraction(anime)"></button>
+      </div>
     </div>
   </div>
   <div
@@ -72,8 +77,10 @@
           anime.episodes
         }}, Status: {{ anime.watchStatus }}
       </p>
-      <button v-on:click="plusEpisode(anime)">+</button>
-      <button v-on:click="deleteInteraction(anime)"></button>
+      <div>
+        <button v-on:click="plusEpisode(anime)">+</button>
+        <button v-on:click="deleteInteraction(anime)"></button>
+      </div>
     </div>
   </div>
   <div
@@ -89,8 +96,10 @@
           anime.episodes
         }}, Status: {{ anime.watchStatus }}
       </p>
-      <button v-on:click="plusEpisode(anime)">+</button>
-      <button v-on:click="deleteInteraction(anime)"></button>
+      <div>
+        <button v-on:click="plusEpisode(anime)">+</button>
+        <button v-on:click="deleteInteraction(anime)"></button>
+      </div>
     </div>
   </div>
 </template>

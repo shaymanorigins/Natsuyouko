@@ -1,24 +1,27 @@
 <template>
   <div class="buttonBox">
-    <button v-on:click="goBeginAnime">begin</button>
-    <button v-on:click="goBackAnime">back</button>
-    <input class="currentPage" v-on:change="goToPage(currentPage - 1)" v-model="currentPage" />
-    <button v-on:click="loadAnime">forward</button>
-    <button v-on:click="goEndAnime">end</button>
+    <div>
+      <button v-on:click="goBeginAnime">begin</button>
+      <button v-on:click="goBackAnime">back</button>
+      <input class="currentPage" v-on:change="goToPage(currentPage - 1)" v-model="currentPage" />
+      <button v-on:click="loadAnime">forward</button>
+      <button v-on:click="goEndAnime">end</button>
+    </div>
+    <div>
+      <select v-model="itemAmount">
+        <option value="25">25</option>
+        <option value="50">50</option>
+        <option value="100">100</option>
+      </select>
+      <input id="searchBar" v-model="searchString" v-on:input="searchAnime" />
+      <select v-model="searchIn" v-on:change="searchAnime">
+        <option value="englishLower">English</option>
+        <option value="romajiLower">Romaji</option>
+        <option value="Native">Native</option>
+      </select>
+    </div>
   </div>
-  <div class="secundBBox">
-    <select v-model="itemAmount">
-      <option value="25">25</option>
-      <option value="50">50</option>
-      <option value="100">100</option>
-    </select>
-    <input id="searchBar" v-model="searchString" v-on:input="searchAnime" />
-    <select v-model="searchIn" v-on:change="searchAnime">
-      <option value="englishLower">English</option>
-      <option value="romajiLower">Romaji</option>
-      <option value="Native">Native</option>
-    </select>
-  </div>
+
   <div class="animeWindow" v-if="allAnime.length > 0">
     <div
       class="animeBox"
@@ -30,12 +33,16 @@
       <p>{{ anime.english || anime.romaji || anime.native }}</p>
     </div>
     <div class="buttonBox">
-      <button v-on:click="goBeginAnime">begin</button>
-      <button v-on:click="goBackAnime">back</button>
-      <input class="currentPage" v-on:change="goToPage(currentPage - 1)" v-model="currentPage" />
-      <button v-on:click="loadAnime">forward</button>
-      <button v-on:click="goEndAnime">end</button>
-      <p style="grid-column: 1/-1">Maximum pages = {{ pages || 1 }}</p>
+      <div>
+        <button v-on:click="goBeginAnime">begin</button>
+        <button v-on:click="goBackAnime">back</button>
+        <input class="currentPage" v-on:change="goToPage(currentPage - 1)" v-model="currentPage" />
+        <button v-on:click="loadAnime">forward</button>
+        <button v-on:click="goEndAnime">end</button>
+      </div>
+      <div>
+        <p style="grid-column: 1/-1">Maximum pages = {{ pages || 1 }}</p>
+      </div>
     </div>
   </div>
   <div v-else>

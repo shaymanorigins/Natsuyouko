@@ -1,6 +1,5 @@
 <template>
-  <div>
-    <h1>Description</h1>
+  <div class="descBox">
     <h1>{{ allAnime?.english || allAnime?.romaji || allAnime?.native }}</h1>
     <img class="imgBann" :src="allAnime?.imgBann" />
     <button v-on:click="minEpisode(id)">-</button>
