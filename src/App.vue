@@ -4,7 +4,6 @@
     <RouterLink to="/MyAnime/all">Interactions</RouterLink>
   </nav>
   <RouterView></RouterView>
-  <img id="tmpnameShow" src="/src/images/tmpName.png" alt="" />
   <footer></footer>
 </template>
 
