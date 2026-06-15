@@ -106,6 +106,7 @@ button {
   }
 
   .animeWindow {
+    grid-column: 1/-1;
     grid-template-columns: 1fr;
   }
 
@@ -115,7 +116,8 @@ button {
   }
 
   .buttonBox {
-    height: 20vw;
+    height: 25vw;
+    grid-column: 1/-1;
     grid-template-columns: 1fr;
     & .currentPage {
       width: 3em;
